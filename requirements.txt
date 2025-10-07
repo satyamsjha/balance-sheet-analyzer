@@ -1,0 +1,7 @@
+# No external dependencies required
+# This tool uses only Python standard library modules:
+# - dataclasses
+# - json
+# - csv
+# - typing
+# - datetime
