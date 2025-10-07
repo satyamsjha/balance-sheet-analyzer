@@ -19,7 +19,7 @@ No external dependencies required - uses Python standard library only.
 
 ```bash
 cd balance_sheet_analyzer
-python main.py
+python3 main.py
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ python main.py
 
 Run the example:
 ```bash
-python main.py
+python3 main.py
 ```
 
 ### Load from JSON
