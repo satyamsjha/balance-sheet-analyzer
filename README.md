@@ -8,6 +8,7 @@ A Python automation tool for analyzing company balance sheets and calculating ke
 
 ## Features
 
+- **🌐 Web Interface**: Interactive Streamlit app - upload files and view results in your browser
 - **Balance Sheet Data Model**: Structured representation of assets, liabilities, and equity
 - **Financial Ratio Calculations**:
   - Liquidity ratios (Current, Quick, Cash)
@@ -15,27 +16,36 @@ A Python automation tool for analyzing company balance sheets and calculating ke
   - Working Capital analysis
 - **Automated Interpretations**: AI-powered insights for each financial metric
 - **Multiple Export Formats**: JSON, CSV, and text reports
+- **Flexible JSON Support**: Handles both flat and nested JSON structures
 - **Balance Verification**: Ensures Assets = Liabilities + Equity
 
 ## Installation
 
-No external dependencies required - uses Python standard library only.
-
 ```bash
-cd balance_sheet_analyzer
-python3 main.py
+pip install streamlit
 ```
+
+For CLI-only usage (no external dependencies required), skip the pip install.
 
 ## Usage
 
-### Quick Start
+### 🌐 Web Interface (Recommended)
 
-Run the example:
+Run the interactive web app:
+```bash
+streamlit run app.py
+```
+
+Then open your browser to **http://localhost:8501**
+
+Simply upload your balance sheet JSON file and see the analysis instantly!
+
+### CLI Usage
+
+Run the command-line example:
 ```bash
 python3 main.py
 ```
-
-### CLI Usage
 
 Analyze your own balance sheet file:
 ```bash
@@ -115,11 +125,12 @@ bs = BalanceSheet(
 
 ```
 balance_sheet_analyzer/
-├── balance_sheet.py      # Data model
-├── analyzer.py           # Financial ratio calculations
+├── app.py               # Streamlit web interface
+├── balance_sheet.py     # Data model
+├── analyzer.py          # Financial ratio calculations
 ├── data_io.py           # Import/export functionality
 ├── report_generator.py  # Report generation
-├── main.py              # Example usage
+├── main.py              # CLI example usage
 └── README.md            # Documentation
 ```
 
