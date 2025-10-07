@@ -85,4 +85,25 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Balance Sheet Analyzer")
+    parser.add_argument("--input", help="JSON path to a balance sheet")
+    parser.add_argument("--output", default="analysis_report.txt", help="Report output file")
+    args = parser.parse_args()
+
+    if args.input:
+        # Load from provided file
+        bs = DataIO.load(args.input)
+        analyzer = FinancialAnalyzer(bs)
+        report_gen = ReportGenerator(bs, analyzer)
+
+        # Print to console
+        report_gen.print_report()
+
+        # Save to file
+        report_gen.save_report(args.output)
+        print(f"\nAnalysis report saved to: {args.output}")
+    else:
+        # Run default example
+        main()
