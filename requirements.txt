@@ -1,5 +1,7 @@
-# No external dependencies required
-# This tool uses only Python standard library modules:
+# Core dependencies
+streamlit
+
+# Standard library modules used:
 # - dataclasses
 # - json
 # - csv

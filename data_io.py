@@ -103,10 +103,114 @@ class DataIO:
                 writer.writerow([ratio_name, f"{value:.2f}"])
 
     @staticmethod
-    def load(path: str) -> BalanceSheet:
-        """Load balance sheet from file (auto-detects JSON or CSV)"""
-        if path.lower().endswith(".json"):
-            return DataIO.from_json(path)
-        if path.lower().endswith(".csv"):
-            raise NotImplementedError("CSV import not yet implemented. Use JSON format.")
-        raise ValueError("Unsupported file type. Use .json")
+    def load(path_or_file) -> BalanceSheet:
+        """Load balance sheet from file path or UploadedFile (auto-detects JSON or CSV)"""
+        # Read JSON from path or UploadedFile
+        if isinstance(path_or_file, str):
+            if path_or_file.lower().endswith(".json"):
+                with open(path_or_file, 'r') as f:
+                    data = json.load(f)
+            elif path_or_file.lower().endswith(".csv"):
+                raise NotImplementedError("CSV import not yet implemented. Use JSON format.")
+            else:
+                raise ValueError("Unsupported file type. Use .json")
+        elif hasattr(path_or_file, "name"):
+            filename = path_or_file.name.lower()
+            if filename.endswith(".json"):
+                data = json.load(path_or_file)
+            elif filename.endswith(".csv"):
+                raise NotImplementedError("CSV import not yet implemented. Use JSON format.")
+            else:
+                raise ValueError("Unsupported uploaded file format. Please upload a JSON file.")
+        else:
+            raise TypeError("Expected file path or UploadedFile object.")
+
+        # Normalize top-level keys to match BalanceSheet constructor
+        alias_map = {
+            "as_of_date": "date",
+            "asOfDate": "date",
+            "companyName": "company_name",
+        }
+        for old, new in alias_map.items():
+            if old in data and new not in data:
+                data[new] = data.pop(old)
+
+        # Handle nested structure (if JSON has assets/liabilities/equity objects)
+        if "assets" in data or "liabilities" in data or "equity" in data:
+            flat_data = {}
+
+            # Extract metadata
+            flat_data["company_name"] = data.get("company_name", "Unknown Company")
+            flat_data["date"] = data.get("date", "")
+
+            # Flatten assets - try both nested and flat structures
+            if "assets" in data:
+                assets = data["assets"]
+                # If assets is a dict with current/long_term
+                if isinstance(assets, dict):
+                    if "current" in assets:
+                        current = assets["current"]
+                        flat_data["cash"] = current.get("cash", 0)
+                        flat_data["accounts_receivable"] = current.get("accounts_receivable", 0)
+                        flat_data["inventory"] = current.get("inventory", 0)
+                        flat_data["other_current_assets"] = current.get("other_current_assets", 0)
+                    else:
+                        # Try flat structure within assets
+                        flat_data["cash"] = assets.get("cash", 0)
+                        flat_data["accounts_receivable"] = assets.get("accounts_receivable", 0)
+                        flat_data["inventory"] = assets.get("inventory", 0)
+                        flat_data["other_current_assets"] = assets.get("other_current_assets", 0)
+                        flat_data["property_plant_equipment"] = assets.get("property_plant_equipment", 0)
+                        flat_data["intangible_assets"] = assets.get("intangible_assets", 0)
+                        flat_data["other_long_term_assets"] = assets.get("other_long_term_assets", 0)
+
+                    if "long_term" in assets:
+                        long_term = assets["long_term"]
+                        flat_data["property_plant_equipment"] = long_term.get("property_plant_equipment", 0)
+                        flat_data["intangible_assets"] = long_term.get("intangible_assets", 0)
+                        flat_data["other_long_term_assets"] = long_term.get("other_long_term_assets", 0)
+
+            # Flatten liabilities
+            if "liabilities" in data:
+                liabilities = data["liabilities"]
+                if isinstance(liabilities, dict):
+                    if "current" in liabilities:
+                        current = liabilities["current"]
+                        flat_data["accounts_payable"] = current.get("accounts_payable", 0)
+                        flat_data["short_term_debt"] = current.get("short_term_debt", 0)
+                        flat_data["other_current_liabilities"] = current.get("other_current_liabilities", 0)
+                    else:
+                        flat_data["accounts_payable"] = liabilities.get("accounts_payable", 0)
+                        flat_data["short_term_debt"] = liabilities.get("short_term_debt", 0)
+                        flat_data["other_current_liabilities"] = liabilities.get("other_current_liabilities", 0)
+                        flat_data["long_term_debt"] = liabilities.get("long_term_debt", 0)
+                        flat_data["other_long_term_liabilities"] = liabilities.get("other_long_term_liabilities", 0)
+
+                    if "long_term" in liabilities:
+                        long_term = liabilities["long_term"]
+                        flat_data["long_term_debt"] = long_term.get("long_term_debt", 0)
+                        flat_data["other_long_term_liabilities"] = long_term.get("other_long_term_liabilities", 0)
+
+            # Flatten equity
+            if "equity" in data:
+                equity = data["equity"]
+                if isinstance(equity, dict):
+                    flat_data["common_stock"] = equity.get("common_stock", 0)
+                    flat_data["retained_earnings"] = equity.get("retained_earnings", 0)
+                    flat_data["other_equity"] = equity.get("other_equity", 0)
+
+            # Fill in any missing required fields with 0
+            required_fields = [
+                'cash', 'accounts_receivable', 'inventory', 'other_current_assets',
+                'property_plant_equipment', 'intangible_assets', 'other_long_term_assets',
+                'accounts_payable', 'short_term_debt', 'other_current_liabilities',
+                'long_term_debt', 'other_long_term_liabilities',
+                'common_stock', 'retained_earnings', 'other_equity'
+            ]
+            for field in required_fields:
+                if field not in flat_data:
+                    flat_data[field] = 0
+
+            data = flat_data
+
+        return BalanceSheet(**data)
