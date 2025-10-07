@@ -31,6 +31,17 @@ Run the example:
 python3 main.py
 ```
 
+### CLI Usage
+
+Analyze your own balance sheet file:
+```bash
+python3 main.py --input sample_balance_sheet.json --output report.txt
+```
+
+Options:
+- `--input`: Path to your JSON balance sheet file
+- `--output`: Output file for the analysis report (default: `analysis_report.txt`)
+
 ### Load from JSON
 
 ```python
