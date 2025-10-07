@@ -1,5 +1,9 @@
 # Balance Sheet Financial Analysis Tool
 
+![Language](https://img.shields.io/badge/Python-3.12%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![CI](https://img.shields.io/github/actions/workflow/status/satyamsjha/balance-sheet-analyzer/ci.yml?label=tests)
+
 A Python automation tool for analyzing company balance sheets and calculating key financial ratios.
 
 ## Features
@@ -120,6 +124,14 @@ balance_sheet_analyzer/
 ```
 
 ## Example Output
+
+```
+Current Ratio: 1.8 (Good)
+Quick Ratio: 1.3 (OK)
+Debt/Equity: 1.5 (Moderate)
+...
+Saved files: analysis_report.txt, balance_sheet.csv, financial_ratios.csv
+```
 
 The tool generates comprehensive reports including:
 - Balance sheet summary
