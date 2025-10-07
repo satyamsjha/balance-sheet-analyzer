@@ -101,3 +101,12 @@ class DataIO:
             writer.writerow(['Ratio', 'Value'])
             for ratio_name, value in ratios.items():
                 writer.writerow([ratio_name, f"{value:.2f}"])
+
+    @staticmethod
+    def load(path: str) -> BalanceSheet:
+        """Load balance sheet from file (auto-detects JSON or CSV)"""
+        if path.lower().endswith(".json"):
+            return DataIO.from_json(path)
+        if path.lower().endswith(".csv"):
+            raise NotImplementedError("CSV import not yet implemented. Use JSON format.")
+        raise ValueError("Unsupported file type. Use .json")
