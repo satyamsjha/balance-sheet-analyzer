@@ -33,10 +33,10 @@ For CLI-only usage (no external dependencies required), skip the pip install.
 
 Run the interactive web app:
 ```bash
-streamlit run app.py
+streamlit run app.py --server.port 8502
 ```
 
-Then open your browser to **http://localhost:8501**
+Then open your browser to **http://localhost:8502**
 
 Simply upload your balance sheet JSON file and see the analysis instantly!
 
